@@ -1,4 +1,3 @@
-
 class SnakeRace{
 	constructor(){
 		this.contenedor = document.getElementById('fondo')
@@ -275,4 +274,55 @@ class SnakeRace{
 		this.divDialogo.style.display = 'block'
 	}
 }
-window.onload = new SnakeRace()
+
+async function configurarReconocimientoVoz(juego) {
+    // Solicitar permisos para el micrófono
+    try {
+        await navigator.mediaDevices.getUserMedia({ audio: true });
+        console.log("Permiso de micrófono concedido.");
+    } catch (error) {
+        console.error("No se pudo obtener el permiso del micrófono:", error);
+        return;
+    }
+
+    // Crear el recognizer usando el modelo base de FFT del navegador
+    const recognizer = speechCommands.create('BROWSER_FFT');
+
+    // Cargar el modelo de reconocimiento de palabras básicas
+    await recognizer.ensureModelLoaded();
+    console.log("Modelo de reconocimiento de voz cargado.");
+
+    // Escuchar continuamente y analizar resultados
+    recognizer.listen(result => {
+        const scores = result.scores;
+        const labels = recognizer.wordLabels();
+        const index = scores.indexOf(Math.max(...scores));
+        const comando = labels[index];
+
+        // Ejecutar acción basada en el comando de voz
+        switch (comando) {
+            case 'up':     // Arriba
+                juego.cabeza.giro = 0;
+                break;
+            case 'down':   // Abajo
+                juego.cabeza.giro = 2;
+                break;
+            case 'left':   // Izquierda
+                juego.cabeza.giro = 3;
+                break;
+            case 'right':  // Derecha
+                juego.cabeza.giro = 1;
+                break;
+            default:
+                console.log("Comando no reconocido:", comando);
+        }
+    }, {
+        probabilityThreshold: 0.75,  // Umbral de confianza
+        includeSpectrogram: true,
+        overlapFactor: 0.5
+    });
+}
+window.onload = () => {
+    const juego = new SnakeRace();
+    configurarReconocimientoVoz(juego); // Inicializa el reconocimiento de voz
+};
