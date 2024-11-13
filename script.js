@@ -261,6 +261,17 @@ class SnakeRace{
         // Usa la API de SpeechSynthesis para hablar el mensaje
         window.speechSynthesis.speak(mensaje);
     }
+	iniciar = () => {
+        // Detiene cualquier mensaje de voz en curso al iniciar o reiniciar la partida
+        window.speechSynthesis.cancel(); 
+
+        this.crear(this.estrella);
+        this.crear(this.rueda);
+        this.crear(this.lata);
+        document.addEventListener('keydown', this.teclaPulsada);
+        this.interval = setInterval(this.actualizar, this.vel);
+        this.bucle();
+    }
 	
     finalizar(tipo = 1) {
         console.log('FIN ' + tipo);
