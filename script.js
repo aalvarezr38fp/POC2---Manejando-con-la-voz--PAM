@@ -250,29 +250,51 @@ class SnakeRace{
 		this.barreras.push(barrera)
 		this.crear(barrera)
 	}
-	finalizar = (tipo = 1) => {
-		console.log('FIN ' + tipo)
-		cancelAnimationFrame(this.animationFrameId)
-		document.removeEventListener('keydown', this.teclaPulsada)
-		clearInterval(this.interval)
-		
-		const img = document.getElementById('imgFinal')
-		const divTexto = this.divDialogo.querySelectorAll('div')[2]
+	hablarTexto(texto) {
+        // Crea una instancia de SpeechSynthesisUtterance con el texto
+        const mensaje = new SpeechSynthesisUtterance(texto);
+        mensaje.lang = 'es-ES'; // Configura el idioma a español
+        mensaje.volume = 1; // Volumen (0 a 1)
+        mensaje.rate = 1; // Velocidad (0.1 a 10)
+        mensaje.pitch = 1; // Tono (0 a 2)
 
-		switch(tipo){
-			case 0: //Colisión con bordes
-				img.src = this.imgChoque1.src
-			case 1: //Colisión con barrera
-				img.src = this.imgChoque2.src
-				divTexto.textContent = 'Pilotar es ir siempre al límite. Lo difícil es saber dónde están tus límites, los de tu coche y los de la pista. Y luego, ampliárlos.'
-				break;
-			case 2:	//Abandono
-				img.src = this.imgAbandono.src
-				divTexto.textContent = 'La gestión de los neumáticos y del combustible es fundamental para ser un buen piloto. Pilotar no es solo girar y frenar; es sobre todo pensar'
-				break;
-		}
-		this.divDialogo.style.display = 'block'
-	}
+        // Usa la API de SpeechSynthesis para hablar el mensaje
+        window.speechSynthesis.speak(mensaje);
+    }
+	
+    finalizar(tipo = 1) {
+        console.log('FIN ' + tipo);
+        cancelAnimationFrame(this.animationFrameId);
+        document.removeEventListener('keydown', this.teclaPulsada);
+        clearInterval(this.interval);
+
+        const img = document.getElementById('imgFinal');
+        const divTexto = this.divDialogo.querySelectorAll('div')[2];
+        let textoFinal = '';
+
+        switch(tipo) {
+            case 0: // Colisión con bordes
+                img.src = this.imgChoque1.src;
+                textoFinal = 'Pilotar es ir siempre al límite. Lo difícil es saber dónde están tus límites, los de tu coche y los de la pista. Y luego, ampliárlos.';
+                divTexto.textContent = textoFinal;
+                break;
+            case 1: // Colisión con barrera
+                img.src = this.imgChoque2.src;
+                textoFinal = 'Pilotar es ir siempre al límite. Lo difícil es saber dónde están tus límites, los de tu coche y los de la pista. Y luego, ampliárlos.';
+                divTexto.textContent = textoFinal;
+                break;
+            case 2: // Abandono
+                img.src = this.imgAbandono.src;
+                textoFinal = 'La gestión de los neumáticos y del combustible es fundamental para ser un buen piloto. Pilotar no es solo girar y frenar; es sobre todo pensar';
+                divTexto.textContent = textoFinal;
+                break;
+        }
+
+        // Llama a la función para leer el texto en voz alta
+        this.hablarTexto(textoFinal);
+
+        this.divDialogo.style.display = 'block';
+    }
 }
 
 async function configurarReconocimientoVoz(juego) {
@@ -303,15 +325,19 @@ async function configurarReconocimientoVoz(juego) {
         switch (comando) {
             case 'up':     // Arriba
                 juego.cabeza.giro = 0;
+				console.log("Comando reconocido:", comando);
                 break;
             case 'down':   // Abajo
                 juego.cabeza.giro = 2;
+				console.log("Comando reconocido:", comando);
                 break;
             case 'left':   // Izquierda
                 juego.cabeza.giro = 3;
+				console.log("Comando reconocido:", comando);
                 break;
             case 'right':  // Derecha
                 juego.cabeza.giro = 1;
+				console.log("Comando reconocido:", comando);
                 break;
             default:
                 console.log("Comando no reconocido:", comando);
